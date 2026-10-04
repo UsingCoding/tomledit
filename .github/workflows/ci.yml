@@ -10,7 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: jdx/mise-action@v3
-      - run: mise run wasm:build
-      - run: git diff --exit-code -- internal/wasm/assets/tomledit.wasm
+      - name: Build canonical Linux WebAssembly module
+        run: mise run wasm:build
+      - name: Verify committed WebAssembly module
+        run: git diff --exit-code -- internal/wasm/assets/tomledit.wasm
       - run: mise run check
       - run: mise run build

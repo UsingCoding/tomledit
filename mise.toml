@@ -2,6 +2,10 @@
 go = "1.27.1"
 rust = "1.99.0"
 
+[env]
+# rust:1.99.0, linux/amd64
+TOMLEDIT_WASM_BUILDER_IMAGE = "rust@sha256:9d5e02aa6c7e9c112ed7a4c438900b41f519a792959cd5445c25de42bfb8388b"
+
 [tasks.bootstrap]
 description = "Install additional development toolchain components"
 run = "rustup target add wasm32-unknown-unknown"
@@ -22,12 +26,26 @@ dir = "rust"
 run = "cargo test"
 
 [tasks."wasm:build"]
-description = "Build TOML editor WebAssembly module"
-depends = ["bootstrap"]
+description = "Build TOML editor WebAssembly module in the canonical Linux environment"
 run = """
-mkdir -p internal/wasm/assets
-cargo build --manifest-path rust/Cargo.toml --target wasm32-unknown-unknown --release
-cp rust/target/wasm32-unknown-unknown/release/tomledit_wasm.wasm internal/wasm/assets/tomledit.wasm
+docker run --rm \
+  --platform linux/amd64 \
+  --env HOST_UID="$(id -u)" \
+  --env HOST_GID="$(id -g)" \
+  --volume "$PWD:/workspace" \
+  --workdir /workspace \
+  "$TOMLEDIT_WASM_BUILDER_IMAGE" \
+  sh -ec '
+    rustup target add wasm32-unknown-unknown
+    CARGO_TARGET_DIR=/tmp/tomledit-target cargo build --locked \
+      --manifest-path rust/Cargo.toml \
+      --target wasm32-unknown-unknown \
+      --release
+    install -Dm0644 \
+      /tmp/tomledit-target/wasm32-unknown-unknown/release/tomledit_wasm.wasm \
+      /workspace/internal/wasm/assets/tomledit.wasm
+    chown "$HOST_UID:$HOST_GID" /workspace/internal/wasm/assets/tomledit.wasm
+  '
 """
 
 [tasks."go:fmt"]

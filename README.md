@@ -58,6 +58,8 @@ mise run wasm:build
 mise run test
 ```
 
+`wasm:build` requires Docker and always builds in a pinned Linux AMD64 Rust image. This makes the committed artifact reproducible on developer machines and GitHub Actions.
+
 The generated editor artifact is committed so consumers build with `CGO_ENABLED=0 go build ./...` and do not need a native toolchain at build or runtime.
 
 ## License

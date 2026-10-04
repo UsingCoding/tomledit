@@ -111,4 +111,4 @@ mise run wasm:build
 mise run test
 ```
 
-`bootstrap` installs the Rust `wasm32-unknown-unknown` target. `wasm:build` depends on it and is safe to rerun. Normal Go consumers only need `CGO_ENABLED=0 go build ./...`.
+`bootstrap` installs the local Rust `wasm32-unknown-unknown` target used by linting. `wasm:build` requires Docker and runs in a pinned Linux AMD64 Rust image, so its generated artifact is reproducible on developer machines and GitHub Actions. Normal Go consumers only need `CGO_ENABLED=0 go build ./...`.
