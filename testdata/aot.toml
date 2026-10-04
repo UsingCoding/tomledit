@@ -1,0 +1,19 @@
+[[foo.items]]
+name = "foo"
+value = "foo"
+group = "one"
+
+[[foo.items]]
+name = "bar"
+value = "bar"
+group = "two"
+
+[[foo.items]]
+name = "baz"
+value = "baz"
+group = "three"
+
+[[foo.items]]
+name = "qux"
+value = "qux"
+group = "four"

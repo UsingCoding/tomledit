@@ -1,0 +1,16 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/mise-action@v3
+      - run: mise run wasm:build
+      - run: git diff --exit-code -- internal/wasm/assets/tomledit.wasm
+      - run: mise run check
+      - run: mise run build

@@ -1,0 +1,52 @@
+[tools]
+go = "1.27.1"
+rust = "1.99.0"
+
+[tasks.bootstrap]
+description = "Install additional development toolchain components"
+run = "rustup target add wasm32-unknown-unknown"
+
+[tasks."rust:fmt"]
+description = "Format Rust shim"
+dir = "rust"
+run = "cargo fmt"
+
+[tasks."rust:lint"]
+description = "Lint Rust shim"
+dir = "rust"
+run = "cargo clippy --target wasm32-unknown-unknown --all-targets -- -D warnings"
+
+[tasks."rust:test"]
+description = "Run native Rust tests"
+dir = "rust"
+run = "cargo test"
+
+[tasks."wasm:build"]
+description = "Build TOML editor WebAssembly module"
+depends = ["bootstrap"]
+run = """
+mkdir -p internal/wasm/assets
+cargo build --manifest-path rust/Cargo.toml --target wasm32-unknown-unknown --release
+cp rust/target/wasm32-unknown-unknown/release/tomledit_wasm.wasm internal/wasm/assets/tomledit.wasm
+"""
+
+[tasks."go:fmt"]
+description = "Format Go code"
+run = "gofmt -w ."
+
+[tasks."go:test"]
+description = "Run Go tests"
+run = "go test ./..."
+
+[tasks.test]
+description = "Run complete test suite"
+depends = ["rust:test", "go:test"]
+
+[tasks.build]
+description = "Build library and examples without CGO"
+depends = ["wasm:build"]
+run = "CGO_ENABLED=0 go build ./..."
+
+[tasks.check]
+description = "Run formatting, linting and tests"
+depends = ["rust:fmt", "rust:lint", "rust:test", "go:fmt", "go:test"]

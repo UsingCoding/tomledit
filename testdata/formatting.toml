@@ -1,0 +1,21 @@
+# project configuration
+
+name    =  'demo'   # important
+
+[foo] # foo config
+enabled=true
+
+
+[[foo.items]]
+name   = "one"
+value = "one:run"
+group  = "foo"
+
+# keep me
+[[foo.items]]
+name = 'two'
+value = "two:run"
+group = "bar"
+
+[unrelated]
+value={foo="bar"}
